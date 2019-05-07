@@ -7,6 +7,9 @@ import Hi2 from '@/components/Hi2'
 import Params from '@/components/Params'
 import Error from '@/components/Error'
 import Count from '@/components/Count'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import Main from '@/components/Main'
 Vue.use(Router)
 
 export default new Router({
@@ -15,6 +18,17 @@ export default new Router({
     {
       path:'*',
       component:Error
+    },
+    {
+      path: '/',
+      name: 'Index',
+      components: {
+        // default:Header,
+        // default:Footer
+        header:Header,
+        main:Main,
+        footer:Footer
+      }
     },
     {
     path:'/count',
@@ -49,7 +63,7 @@ export default new Router({
       )
     },
     {
-      path: '/',
+      path: '/helloworld',
       name: 'HelloWorld',
       components: {
         default:HelloWorld,
