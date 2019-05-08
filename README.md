@@ -10,4 +10,9 @@ port: 8080, // 端口号（默认8080）
 autoOpenBrowser: false,//是否自动打开浏览器
 //想让浏览器自动打开，只需将false改为true即可，为防止端口号冲突，这里也可以随意更改端口号
 
- 3
+ 3 打包之后无法本地打开
+ 更改config/index.js下build的assetsPublicPath属性值为"./"，妥
+
+ 4 使用axios  
+ import axios from 'axios';//引入axios
+Vue.prototype.$axios = axios; //添加axios到Vue的原型对象上
