@@ -91,13 +91,63 @@
       <div class="swiper">
         <el-carousel :interval="4000" type="card" height="200px">
           <el-carousel-item v-for="item in 6" :key="item">
-            <h3 class="medium">{{ item }}</h3>
+            <!-- <h3 class="medium">{{ item }}</h3> -->
+            <img style="height:100%;width:100%" src="https://pic.qiantucdn.com/back_origin_pic/19/03/17/9bdf6baf2ed3a85156edc809bc159a70.jpg!/fw/1024/watermark/url/L2ltYWdlcy93YXRlcm1hcmsvc2h1aXlpbi5wbmc===/align/center" alt="">
           </el-carousel-item>
         </el-carousel>
       </div>
-      <div class="audio">
-        <audio src="song.mp3" controls="controls" loop="loop" autoplay="autoplay">亲 您的浏览器不支持html5的audio标签</audio>
+      <div class="calendar">
+        
       </div>
+      <div class="audio_area"> 
+        <div class="songList_box">
+          <div class="songList" v-for="(item,index) in songList" :key="index">
+            <!-- <div>{{item}}---{{index}}</div> -->
+            <div>{{item.name}}</div>
+            <img :src="item.pic" alt="" style="height:40px">
+            <div>{{item.singer}}</div>
+          </div>
+        </div>
+
+        <!-- /* 音乐播放器 */ -->
+        <div class="audio_box">
+          <audio id="myAudio" preload="auto">
+            <source src="https://api.itooi.cn/music/netease/url?id=1349292048&key=579621905">
+            <source src="http://zjdx1.sc.chinaz.com/Files/DownLoad/sound1/201506/6039.mp3">
+          </audio>
+          <div id="cdPlayer">
+            <div id="myConsole">曲名</div>
+            <div id="CD">
+              <div id="cdDisk"></div>
+              <div id="cdCover"></div>
+            </div>
+            <div id="cdControllerArm"></div>
+            <div id="playMode">
+              <div id="shuffleMode" class="mode" title="随机播放"><i class="iconfontPlayMode">&#xe85e;</i>&nbsp;</div>
+              <div id="listMode" class="mode" title="顺序播放"><i class="iconfontPlayMode">&#xe7ec;</i>&nbsp;</div>
+              <div id="loopMode" class="mode" title="单曲循环"><i class="iconfontPlayMode">&#xe7df;</i>&nbsp;</div>
+            </div>
+            <div id="controllerButton">
+              <div id="playBtn" class="button" title="播放"><i class="iconfont">&#xe830;</i>&nbsp;</div>
+              <div id="pauseBtn" class="button" title="暂停"><i class="iconfont">&#xe81f;</i>&nbsp;</div>
+              <div id="nextBtn" class="button" title="下一曲"><i class="iconfont">&#xe811;</i>&nbsp;</div>
+              <div id="preBtn" class="button" title="上一曲"><i class="iconfont">&#xe826;</i>&nbsp;</div>
+              <div id="stopBtn" class="button" title="停止"><i class="iconfont">&#xe875;</i>&nbsp;</div>
+              <div id="muteBtn" class="button" title="静音"><i class="iconfont">&#xe8b1;</i>&nbsp;</div>
+              <div id="firstBtn" class="button" title="首曲"><i class="iconfont">&#xe787;</i>&nbsp;</div>
+              <div id="lastBtn" class="button" title="末曲"><i class="iconfont">&#xe7cc;</i>&nbsp;</div>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';color:#ffffff">
+          </div>
+        </div>
+        <!-- /* 音乐播放器 */ -->
+        
+      </div>
+
+
+
     </div>
   </div>
 </template>
@@ -107,7 +157,9 @@ export default {
   name: 'Home',
   data () {
     return {
-      msg: 'home'
+      msg: 'home',
+      songList:null,
+      value: new Date()
     }
   },
   created () {
@@ -121,7 +173,9 @@ export default {
         }
     })
     .then((res)=>{
-      console.log(res)
+      console.log(res.data.data.songs[0])
+      console.log(res.data.data.songs[1])
+      this.songList=res.data.data.songs
     })
     .catch((err)=>{
       console.log(err)
@@ -232,6 +286,7 @@ export default {
   margin:auto;
   position: relative;
 }
+/* 轮播 */
 .swiper{width:1200px;margin:auto}
 .el-carousel__item h3 {
     color: #475669;
@@ -248,6 +303,231 @@ export default {
   .el-carousel__item:nth-child(2n+1) {
     background-color: #d3dce6;
   }
+  /* 日历 */
+.calendar table:nth-child(5){
+
+}
+/* 音乐 */
+.audio_area{
+  border:5px solid black;
+  display: flex;
+}
+.songList_box{
+  width:400px;
+}
+.songList{
+  width:400px;
+  height: 90px;
+}
+.audio_box{
+  position: relative;
+  /* background:chartreuse; */
+  height: 1000px;
+  width:800px;
+  /* float:right; */
+}
+/* 音乐播放器 */
+/*动画基础*/
+
+@keyframes myCDRotate
+{
+    from {transform:rotate(0);}
+    to {transform:rotate(360deg);}
+}
+
+@-moz-keyframes myCDRotate /* Firefox */
+{
+    from {transform:rotate(0);}
+    to {transform:rotate(360deg);}
+}
+
+@-webkit-keyframes myCDRotate /* Safari 和 Chrome */
+{
+    from {transform:rotate(0);}
+    to {transform:rotate(360deg);}
+}
+
+@-o-keyframes myCDRotate /* Opera */
+{
+    from {transform:rotate(0);}
+    to {transform:rotate(360deg);}
+}
+
+@font-face
+{
+    font-family: 'iconfont';
+    src: url('./fonts/iconfont.eot');
+    src: url('./fonts/iconfont.eot?#iefix') format('embedded-opentype'), 
+    url('./fonts/iconfont.woff') format('woff'), 
+    url('./fonts/iconfont.ttf') format('truetype'), 
+    url('./fonts/iconfont.svg#iconfont') format('svg');
+} 
+
+.iconfont
+{
+    font-family:"iconfont" !important;
+    font-size:20px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+.iconfontPlayMode
+{
+    font-family:"iconfont" !important;
+    font-size:16px;
+    font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+#cdPlayer
+{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 27%;
+    left: 47%;
+    margin-top: -250px;
+    margin-left: -250px;
+}
+
+#CD
+{
+    width: 100%;
+    height: 100%;
+    background: url("./imgs/cdbk.png") no-repeat;
+    background-size: cover;
+    z-index: 2000;
+    position: absolute;
+}
+#cdDisk
+{
+    width: 80%;
+    height: 80%;
+    text-align: center;
+    background: url("./imgs/cddisk.png") no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 2000;
+}
+#cdCover
+{
+    width: 36%;
+    height: 36%;
+    /*border-radius: 100px;*/
+    background: url("./imgs/logo.png") no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -18%;
+    margin-left: -18%;
+    z-index: 3;
+    transition:all 0.5s;
+}
+.cdStart
+{
+    animation:myCDRotate 5s infinite linear;
+}
+.cdPause
+{
+    /*animation:myCDRotate 1s 2 alternate;*/
+    /*animation:myCDRotate 2s infinite linear;*/
+    animation-play-state:paused;
+}
+#cdControllerArm
+{
+    width: 20%;
+    height: 50%;
+    /*border-radius: 100px;*/
+    background: url("./imgs/controllerArm.png") no-repeat;
+    background-size: contain;
+    position: absolute;
+    z-index: 2001;
+    top: 80px;
+    left: -60px;
+    -moz-transform-origin: top right;
+    -webkit-transform-origin:top right;
+    -o-transform-origin:top right;
+    transition:all 0.8s;
+    transform:rotate(-130deg);
+}
+
+#controllerButton
+{
+    width: 125px;
+    height: 220px;
+    position: absolute;
+    top: 312px;
+    right: -60px;
+    margin-top: -250px;
+    z-index: 1;
+}
+#controllerButton .button
+{
+    width: 100px;
+    height: 37px;
+    text-align: right;
+    line-height: 37px;
+    color: #b1b9c6;
+    font-size: 20px;
+    font-family: '华文新魏';
+    background: url("./imgs/controllBtn.png") no-repeat;
+    background-size: contain;
+    margin:10px 0;
+    cursor: pointer;
+}
+#controllerButton .button:hover
+{
+    color: #ffffff;
+}
+
+#playMode
+{
+    width: 120px;
+    height: 30px;
+    text-align: center;
+    position: absolute;
+    right: 2px;
+    bottom: 20px;
+    z-index: 2001;
+}
+#playMode .mode
+{
+    width: 26px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    float: left;
+    color: #b1b9c6;
+    font-size: 16px;
+    margin: 0 2px;
+    padding-left: 4px;
+    cursor: pointer;
+}
+#playMode .mode:hover
+{
+    color: #e74d3c;
+}
+
+#myConsole
+{
+    width: 500px;
+    height: 30px;
+    font-family: '华文新魏';
+    font-size: 20px;
+    color:  #e74d3c;
+    position: absolute;
+    left: 30px;
+    bottom: 10px;
+    z-index: 2001;
+}
+/* 音乐播放器 */
 /* 大风车 */
 #canvas{
   display: none;
