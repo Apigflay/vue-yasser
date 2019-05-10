@@ -163,13 +163,14 @@ export default {
     }
   },
   created () {
-    this.$axios.get('/api/music/netease/songList', {  
+    this.$axios.get('/music/netease/songList', {  
       //params参数必写 , 如果没有参数传{}也可以
         params: {  
          "key": '579621905',
           "id": '3778678',
           "limit":'10',
-          "offset":"0"
+          "offset":"0",
+          "contentType": "application/json;charset=utf-8"
         }
     })
     .then((res)=>{
@@ -281,6 +282,7 @@ export default {
   background:#cecece;
 }
 .draw_area{
+  overflow: hidden;
   width:1200px;
   height:600px;
   margin:auto;
@@ -309,7 +311,7 @@ export default {
 }
 /* 音乐 */
 .audio_area{
-  border:5px solid black;
+  /* border:5px solid black; */
   display: flex;
 }
 .songList_box{
@@ -530,13 +532,15 @@ export default {
 /* 音乐播放器 */
 /* 大风车 */
 #canvas{
-  display: none;
+  /* display: none; */
   position: absolute;
   top:-7%;
 }
 /* 大风车 */
 /* 多啦a梦 */
-.pokonyan{display:none;width:572px; height:397px; margin:0 auto; position: absolute; left:22%; top:56%; margin-left:-286px; margin-top:-198px;}
+.pokonyan{
+  /* display:none; */
+width:572px; height:397px; margin:0 auto; position: absolute; left:22%; top:56%; margin-left:-286px; margin-top:-198px;}
 
 .header{width:340px; height:318px; position:absolute; right:12px; top:0; border-top-left-radius:50%; border-top-right-radius:50%; border-bottom-left-radius:50%; border-bottom-right-radius:48%; background:#00a0e9; border:#000 solid 2px; z-index: 6;}
 .header .face{width: 305px; height:235px;  position: absolute; right: -8px; bottom: 0px; background:#fff; border:#000 solid 2px; border-top-left-radius:40%; border-top-right-radius:40%; border-bottom-left-radius:50%; border-bottom-right-radius:50%;  -webkit-transform:rotate(-25deg); -moz-transform:rotate(-25deg); transform:rotate(-25deg);}

@@ -3,7 +3,9 @@
     <div class="logo_area_rap">
         <div class="logo_area">
             <!--   -->
-            <marquee direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
+            <img class="male" src="./imgs/male.jpg" alt="xiao" title="xiao">
+            <img class="female" src="./imgs/female.jpg" alt="xiao" title="xiao">
+            <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
                 <font color='red' size="5">不</font>
             </marquee>
             <marquee direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="200">
@@ -107,6 +109,18 @@ export default {
     /* background:#cecece; */
     display: flex;
     align-items: center;
+}
+.male{
+height:100%;
+margin-left:50px;
+}
+.female{
+height:100%;
+position:relative;
+left:-24px;top:2px;
+}
+.first{
+    margin-left: 150px;
 }
 .quickResponse{
     margin-left: 10px;

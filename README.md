@@ -16,3 +16,11 @@ autoOpenBrowser: false,//是否自动打开浏览器
  4 使用axios  
  import axios from 'axios';//引入axios
 Vue.prototype.$axios = axios; //添加axios到Vue的原型对象上
+
+5 vue项目打包后资源相对引用路径的和背景图片路径问题
+1、修改config => index.js => build => assetsPublicPath 中的'/'成为'./'
+2、在build => util.js 里找到ExtractTextPlugin.extract增加一行：publicPath: '../../'，主要解决背景图片路径的问题。
+
+
+6 vue  线上请求出问题
+https://www.jianshu.com/p/686f17737ffb
