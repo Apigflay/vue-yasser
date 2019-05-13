@@ -102,21 +102,21 @@
       <div class="audio_area"> 
         <div class="songList_box">
           <div class="songList" v-for="(item,index) in songList" :key="index">
-            <!-- <div>{{item}}---{{index}}</div> -->
-            <div>{{item.name}}</div>
             <img :src="item.pic" alt="" style="height:40px">
-            <div>{{item.singer}}</div>
+            <div class="name">{{item.name}}</div>---
+            <div class="singer">{{item.singer}}</div>
+            <div style="background:black;color:white;" @click="singSongs" class="start" :id="index" v-if="index==songId">正在播放</div>
+            <div @click="singSongs" class="start" :id="index" v-else="">播放</div>
           </div>
         </div>
 
         <!-- /* 音乐播放器 */ -->
         <div class="audio_box">
-          <audio id="myAudio" preload="auto">
-            <source src="https://api.itooi.cn/music/netease/url?id=1349292048&key=579621905">
-            <source src="http://zjdx1.sc.chinaz.com/Files/DownLoad/sound1/201506/6039.mp3">
+          <audio ref="audio" id="myAudio" preload="auto" :autoplay="autoplay">
+            <source :src="nowSongUrl">
           </audio>
           <div id="cdPlayer">
-            <div id="myConsole">曲名</div>
+            <div id="myConsole">{{nowSongName}}------曲名</div>
             <div id="CD">
               <div id="cdDisk"></div>
               <div id="cdCover"></div>
@@ -128,8 +128,8 @@
               <div id="loopMode" class="mode" title="单曲循环"><i class="iconfontPlayMode">&#xe7df;</i>&nbsp;</div>
             </div>
             <div id="controllerButton">
-              <div id="playBtn" class="button" title="播放"><i class="iconfont">&#xe830;</i>&nbsp;</div>
-              <div id="pauseBtn" class="button" title="暂停"><i class="iconfont">&#xe81f;</i>&nbsp;</div>
+              <div id="playBtn" @click="goStop" class="button" title="播放"><i class="iconfont">&#xe81f;</i>&nbsp;</div>
+              <div id="pauseBtn" @click="goOn" class="button" title="暂停"><i class="iconfont">&#xe830;</i>&nbsp;</div>
               <div id="nextBtn" class="button" title="下一曲"><i class="iconfont">&#xe811;</i>&nbsp;</div>
               <div id="preBtn" class="button" title="上一曲"><i class="iconfont">&#xe826;</i>&nbsp;</div>
               <div id="stopBtn" class="button" title="停止"><i class="iconfont">&#xe875;</i>&nbsp;</div>
@@ -159,7 +159,58 @@ export default {
     return {
       msg: 'home',
       songList:null,
-      value: new Date()
+      value: new Date(),
+      firstIndex:-1,//初始歌曲index
+      nowSongName:'暂未播放歌曲',//正在播放的歌曲名称
+      nowSongUrl:'',//正在播放的歌曲url
+      text:'播放',//播放的按钮状态
+      songId:null,//播放状态
+      autoplay:false,//初始自动播放
+      testSong:
+      [
+    {
+        "title" : "行歌",
+        "artist" : "陈鸿宇",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "有梦好甜蜜(口琴变奏)",
+        "artist" : "渠成",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "心愿",
+        "artist" : "四个女生",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "广东姑娘",
+        "artist" : "五条人",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "扬州",
+        "artist" : "李晋",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "小五",
+        "artist" : "崔跃文",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    },
+    {
+        "title" : "多兰娜",
+        "artist" : "浩子",
+        "coverURL" : "",
+        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
+    }
+]
     }
   },
   created () {
@@ -174,9 +225,10 @@ export default {
         }
     })
     .then((res)=>{
-      console.log(res.data.data.songs[0])
-      console.log(res.data.data.songs[1])
-      this.songList=res.data.data.songs
+      // console.log(res.data.data.songs)
+      // console.log(res.data.data.songs[1])
+      this.songList=res.data.data.songs;
+      // this.nowSongUrl=res.data.data.songs[1].url;
     })
     .catch((err)=>{
       console.log(err)
@@ -187,6 +239,28 @@ export default {
      
   },
   methods: {
+    goOn:function(){
+      console.log(2222222)
+    },
+    goStop:function(){
+      console.log(11111111)
+    },
+    //播放歌曲 列表点击
+    singSongs:function(e){
+      // console.log(e.target.id)
+      // console.log(e.currentTarget.id)
+      this.firstIndex=e.currentTarget.id;//保存播放index
+      this.songId=e.currentTarget.id;//播放状态
+      this.$refs.audio.src = this.songList[e.currentTarget.id].url;
+      this.nowSongName=this.songList[e.currentTarget.id].name;
+      this.autoplay="autoplay";
+      var that =this;
+      // setInterval(function(){
+      //   console.log(that.$refs.audio.ended)
+      // },1000)
+      // console.log(this.$refs.audio.ended)
+    },
+    //重新加载
     //画大风车
     draw:function(){
       //获取画布的2d上下文
@@ -316,15 +390,50 @@ export default {
 }
 .songList_box{
   width:400px;
+  height: 600px;
+  overflow-y: scroll;
 }
 .songList{
-  width:400px;
-  height: 90px;
+  width:363px;
+  overflow: hidden;
+  padding:0 10px;
+  background: #31C27C; 
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  margin-bottom: 10px;
+}
+.songList .name{
+  width:120px;
+  font-family: '华文新魏';
+  font-size: 16px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.songList .singer{
+  width:80px;
+  font-family: '华文新魏';
+  font-size: 14px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.songList .start{
+  font-size: 16px;
+  cursor: pointer;
+  width: 70px;
+  height: 40px;
+  border-radius: 14px;
+  line-height: 40px;
+  text-align: center;
+  background: #FCFCFC;
 }
 .audio_box{
   position: relative;
   /* background:chartreuse; */
-  height: 1000px;
+  height: 600px;
   width:800px;
   /* float:right; */
 }
@@ -390,7 +499,7 @@ export default {
     width: 500px;
     height: 500px;
     position: absolute;
-    top: 27%;
+    top: 47%;
     left: 47%;
     margin-top: -250px;
     margin-left: -250px;
@@ -528,18 +637,20 @@ export default {
     left: 30px;
     bottom: 10px;
     z-index: 2001;
+    text-align: left;
+    padding-left: 10px;
 }
 /* 音乐播放器 */
 /* 大风车 */
 #canvas{
-  /* display: none; */
+  display: none;
   position: absolute;
   top:-7%;
 }
 /* 大风车 */
 /* 多啦a梦 */
 .pokonyan{
-  /* display:none; */
+  display:none;
 width:572px; height:397px; margin:0 auto; position: absolute; left:22%; top:56%; margin-left:-286px; margin-top:-198px;}
 
 .header{width:340px; height:318px; position:absolute; right:12px; top:0; border-top-left-radius:50%; border-top-right-radius:50%; border-bottom-left-radius:50%; border-bottom-right-radius:48%; background:#00a0e9; border:#000 solid 2px; z-index: 6;}
