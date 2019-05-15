@@ -3,6 +3,12 @@
   <div class="main_rap">
     <div class="main">
       <div class="draw_area">
+        <img class="baihe baihe1" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
+        <img class="baihe baihe2" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
+        <img class="baihe baihe3" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
+        <img class="baihe baihe4" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
+        <img class="baihe baihe5" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
+        <img @click="goWeather" class="baihe baihe6" src="http://yasser.top/imgs/baihebg.png" title="点击查看天气" alt="白鹤">
         <canvas id="canvas" width="800" height="600"></canvas>
         <div class="pokonyan">
           <!--头-->
@@ -90,16 +96,17 @@
       </div>
       <div class="swiper">
         <el-carousel :interval="4000" type="card" height="200px">
-          <el-carousel-item v-for="item in 6" :key="item">
+          <el-carousel-item v-for="item in swiperImg" :key="item">
             <!-- <h3 class="medium">{{ item }}</h3> -->
-            <img style="height:100%;width:100%" src="https://pic.qiantucdn.com/back_origin_pic/19/03/17/9bdf6baf2ed3a85156edc809bc159a70.jpg!/fw/1024/watermark/url/L2ltYWdlcy93YXRlcm1hcmsvc2h1aXlpbi5wbmc===/align/center" alt="">
+            <img style="height:100%;width:100%" :src="item" alt="">
           </el-carousel-item>
         </el-carousel>
       </div>
       <div class="calendar">
         
       </div>
-      <div class="audio_area"> 
+      <div class="audio_area" style="position:relative"> 
+        <div @click="goFast" class="goF" style="width: 50px;height: 50px;background: rebeccapurple;position: absolute;top: 3px;left:410px;cursor:pointer;z-index:1000;">快进</div>
         <div class="songList_box">
           <div class="songList" v-for="(item,index) in songList" :key="index">
             <img :src="item.pic" alt="" style="height:40px">
@@ -112,30 +119,30 @@
 
         <!-- /* 音乐播放器 */ -->
         <div class="audio_box">
-          <audio ref="audio" id="myAudio" preload="auto" :autoplay="autoplay">
+          <audio ref="audio" id="myAudio" preload="auto" muted="flase" currentTime="100" :autoplay="autoplay" :paused="paused">
             <source :src="nowSongUrl">
           </audio>
           <div id="cdPlayer">
             <div id="myConsole">{{nowSongName}}------曲名</div>
             <div id="CD">
               <div id="cdDisk"></div>
-              <div id="cdCover"></div>
+              <div id="cdCover" :class="rotate?'cdStart':'cdPause'"></div>
             </div>
-            <div id="cdControllerArm"></div>
+            <div id="cdControllerArm" :class="rotate?'xuanzhuan':'aaaa zanting'"></div>
             <div id="playMode">
-              <div id="shuffleMode" class="mode" title="随机播放"><i class="iconfontPlayMode">&#xe85e;</i>&nbsp;</div>
+              <div id="shuffleMode" class="mode" title="只能顺序播放"><i class="iconfontPlayMode">&#xe85e;</i>&nbsp;</div>
               <div id="listMode" class="mode" title="顺序播放"><i class="iconfontPlayMode">&#xe7ec;</i>&nbsp;</div>
-              <div id="loopMode" class="mode" title="单曲循环"><i class="iconfontPlayMode">&#xe7df;</i>&nbsp;</div>
+              <div id="loopMode" class="mode" title="只能顺序播放"><i class="iconfontPlayMode">&#xe7df;</i>&nbsp;</div>
             </div>
             <div id="controllerButton">
-              <div id="playBtn" @click="goStop" class="button" title="播放"><i class="iconfont">&#xe81f;</i>&nbsp;</div>
-              <div id="pauseBtn" @click="goOn" class="button" title="暂停"><i class="iconfont">&#xe830;</i>&nbsp;</div>
-              <div id="nextBtn" class="button" title="下一曲"><i class="iconfont">&#xe811;</i>&nbsp;</div>
-              <div id="preBtn" class="button" title="上一曲"><i class="iconfont">&#xe826;</i>&nbsp;</div>
-              <div id="stopBtn" class="button" title="停止"><i class="iconfont">&#xe875;</i>&nbsp;</div>
-              <div id="muteBtn" class="button" title="静音"><i class="iconfont">&#xe8b1;</i>&nbsp;</div>
-              <div id="firstBtn" class="button" title="首曲"><i class="iconfont">&#xe787;</i>&nbsp;</div>
-              <div id="lastBtn" class="button" title="末曲"><i class="iconfont">&#xe7cc;</i>&nbsp;</div>
+              <div id="playBtn" @click="goOn" class="button" title="播放"><i class="iconfont">&#xe81f;</i>&nbsp;</div>
+              <div id="pauseBtn" @click="goStop" class="button" title="暂停"><i class="iconfont">&#xe830;</i>&nbsp;</div>
+              <div id="nextBtn" @click="goNext" class="button" title="下一曲"><i class="iconfont">&#xe811;</i>&nbsp;</div>
+              <div id="preBtn"  @click="goAgo" class="button" title="上一曲"><i class="iconfont">&#xe826;</i>&nbsp;</div>
+              <div id="stopBtn" @click="goInit" class="button" title="停止"><i class="iconfont">&#xe875;</i>&nbsp;</div>
+              <div id="muteBtn" @click="goQuiet" class="button" :title="voiceTitle"><i class="iconfont">&#xe8b1;</i>&nbsp;</div>
+              <div id="firstBtn" @click="goFirst" class="button" title="首曲"><i class="iconfont">&#xe787;</i>&nbsp;</div>
+              <div id="lastBtn" @click="goLast" class="button" title="末曲"><i class="iconfont">&#xe7cc;</i>&nbsp;</div>
             </div>
           </div>
 
@@ -166,51 +173,12 @@ export default {
       text:'播放',//播放的按钮状态
       songId:null,//播放状态
       autoplay:false,//初始自动播放
-      testSong:
-      [
-    {
-        "title" : "行歌",
-        "artist" : "陈鸿宇",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "有梦好甜蜜(口琴变奏)",
-        "artist" : "渠成",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "心愿",
-        "artist" : "四个女生",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "广东姑娘",
-        "artist" : "五条人",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "扬州",
-        "artist" : "李晋",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "小五",
-        "artist" : "崔跃文",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    },
-    {
-        "title" : "多兰娜",
-        "artist" : "浩子",
-        "coverURL" : "",
-        "musicURL" : "http://dx.sc.chinaz.com/Files/DownLoad/sound1/201510/6457.mp3"
-    }
-]
+      rotate:false,//旋转棍子和猫咪
+      paused:null,
+      voiceTitle:'点击静音',//静音的提示
+      // zanting:zanting,
+      // xuanzhuan:xuanzhuan,
+      swiperImg:['http://yasser.top/imgs/1.jpg','http://yasser.top/imgs/2.jpg','http://yasser.top/imgs/3.jpg','http://yasser.top/imgs/4.jpg'],//轮播列表图片
     }
   },
   created () {
@@ -225,7 +193,7 @@ export default {
         }
     })
     .then((res)=>{
-      // console.log(res.data.data.songs)
+      console.log(res.data.data.songs)
       // console.log(res.data.data.songs[1])
       this.songList=res.data.data.songs;
       // this.nowSongUrl=res.data.data.songs[1].url;
@@ -238,30 +206,184 @@ export default {
      this.draw()//大风车
      
   },
+  computed: {
+    fo:function(){
+
+    }
+  },
+  watch: {
+    
+  },
   methods: {
-    goOn:function(){
-      console.log(2222222)
+    //获取天气
+    goWeather:function(){
+      console.log(222)
+      console.log(navigator.geolocation)
+      // this.$axios.get('/music/netease/songList', {  
+      // //params参数必写 , 如果没有参数传{}也可以
+      //     params: {  
+        
+      //     }
+      // })
+      // .then((res)=>{
+      //   console.log(res)
+      // })
+      // .catch((err)=>{
+      //   console.log(err)
+      // })
     },
+    //开始播放
+    goOn:function(){
+      this.rotate=true;
+      // console.log(audio.currentTime)
+      if(this.firstIndex==-1){
+          // this.rotate=true;
+          this.firstIndex=0;//保存播放index
+          this.songId=0;//播放状态
+          this.$refs.audio.src = this.songList[0].url;
+          this.nowSongName=this.songList[0].name;
+          this.autoplay="autoplay";
+      }else{
+          let audio =document.getElementById('myAudio');
+          audio.play()
+      }
+    },
+    //暂停
     goStop:function(){
-      console.log(11111111)
+      this.rotate=false;
+      let audio =document.getElementById('myAudio');
+      audio.pause()
+    },
+    //上一首
+    goAgo:function(){
+        console.log(this.firstIndex)
+      if(this.firstIndex==-1){
+        alert("没有播放")
+      }else if(this.firstIndex==0){
+        alert("di一首")
+      }else{
+        this.rotate=true;
+        this.firstIndex=this.firstIndex*1-1;//保存播放index
+        this.songId=this.firstIndex;//播放状态
+        this.$refs.audio.src = this.songList[this.firstIndex].url;
+        this.nowSongName=this.songList[this.firstIndex].name;
+        this.autoplay="autoplay";
+        console.log(this.firstIndex)
+      }
+    },
+    //下一首
+    goNext:function(){
+      console.log(this.firstIndex)
+      if(this.firstIndex==-1){
+        this.rotate=true;
+        this.firstIndex=0;//保存播放index
+        this.songId=0;//播放状态
+        this.$refs.audio.src = this.songList[0].url;
+        this.nowSongName=this.songList[0].name;
+        this.autoplay="autoplay";
+      }else if(this.firstIndex==199){
+        alert("zui后一首")
+      }else{
+        this.rotate=true;
+        this.firstIndex=this.firstIndex*1+1;//保存播放index
+        this.songId=this.firstIndex;//播放状态
+        this.$refs.audio.src = this.songList[this.firstIndex].url;
+        this.nowSongName=this.songList[this.firstIndex].name;
+        this.autoplay="autoplay";
+        console.log(this.firstIndex)
+      }
+    },
+    //停止
+    goInit:function(){
+      this.rotate=false;
+      this.firstIndex=-1;//保存播放index
+      this.songId=-1;//播放状态
+      this.$refs.audio.src ="";
+      this.nowSongName="暂未播放歌曲";
+      this.autoplay="";
+    },
+    //静音
+    goQuiet:function(){
+      //false 未静音  true 静音
+      if(this.$refs.audio.muted===false){
+        this.$refs.audio.muted='muted';
+        this.voiceTitle="取消静音"
+      }else{
+        this.$refs.audio.muted=false;
+        this.voiceTitle="点击静音"
+      }
+    },
+    //首曲
+    goFirst:function(){
+        this.rotate=true;
+        this.firstIndex=0;//保存播放index
+        this.songId=0;//播放状态
+        this.$refs.audio.src = this.songList[0].url;
+        this.nowSongName=this.songList[0].name;
+        this.autoplay="autoplay";
+        console.log(this.firstIndex)
+    },
+    //末曲
+    goLast:function(){
+        this.rotate=true;
+        this.firstIndex=199;//保存播放index
+        this.songId=199;//播放状态
+        this.$refs.audio.src = this.songList[199].url;
+        this.nowSongName=this.songList[199].name;
+        this.autoplay="autoplay";
+        console.log(this.firstIndex)
     },
     //播放歌曲 列表点击
     singSongs:function(e){
       // console.log(e.target.id)
       // console.log(e.currentTarget.id)
-      this.firstIndex=e.currentTarget.id;//保存播放index
-      this.songId=e.currentTarget.id;//播放状态
-      this.$refs.audio.src = this.songList[e.currentTarget.id].url;
-      this.nowSongName=this.songList[e.currentTarget.id].name;
-      this.autoplay="autoplay";
-      var that =this;
-      // setInterval(function(){
-      //   console.log(that.$refs.audio.ended)
-      // },1000)
-      // console.log(this.$refs.audio.ended)
+      console.log(this.$refs.audio.error)
+      if(this.$refs.audio.error==null){
+            this.rotate=true;
+            this.firstIndex=e.currentTarget.id;//保存播放index
+            this.songId=e.currentTarget.id;//播放状态
+            this.$refs.audio.src = this.songList[e.currentTarget.id].url;
+            this.nowSongName=this.songList[e.currentTarget.id].name;
+            this.autoplay="autoplay";
+            let audio =document.getElementById('myAudio');
+            var that =this;
+            clearInterval(timer)
+            var timer =setInterval(function(){
+              // console.log(that.$refs.audio.ended)
+              // console.log(audio.ended)
+              // console.log(that.firstIndex)
+              if(audio.ended==true){
+                // console.log(that.firstIndex+"换个歌曲")
+                that.firstIndex=that.firstIndex*1+1;//保存播放index
+                that.$refs.audio.src = that.songList[that.firstIndex].url;
+                that.songId=that.firstIndex;
+                that.nowSongName=that.songList[that.firstIndex].name;
+                // console.log("jieshu")
+              }
+            },1000)
+            // console.log(this.$refs.audio.ended)
+      }else{
+            alert("抱歉，歌曲资源可能开小差了，请换一首")
+      }
+     
     },
-    //重新加载
-    //画大风车
+    //定时查播放情况
+    timer:function(){
+        
+        // console.log(1111)
+    },
+    //快进
+    goFast:function(){
+      console.log("kuaijin")
+
+      //  this.$refs.audio.fastSeek(103)
+      let audio =document.getElementById('myAudio');
+      // audio.fastSeek()
+      // audio.play()
+
+      // audio.fastSeek("150")
+    },
+    // //画大风车
     draw:function(){
       //获取画布的2d上下文
       var ctx = document.getElementById("canvas").getContext("2d");
@@ -341,7 +463,6 @@ export default {
         },50);
     }
   },
-  
 }
 </script>
 
@@ -361,6 +482,35 @@ export default {
   height:600px;
   margin:auto;
   position: relative;
+  background: url("http://yasser.top/imgs/greenbg3.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.draw_area .baihe{
+    z-index: 1000;
+    width: 140px;
+    position: absolute;
+    top: 47px;
+    left: 662px;
+    cursor: pointer;
+}
+.draw_area .baihe1{
+    width: 64px;
+    top: 47px;
+    left: 447px;
+}
+.draw_area .baihe2{
+    width: 108px;
+    top: 75px;
+    left: 509px;
+}
+.draw_area .baihe3{
+    width: 102px;
+    top: -17px;
+    left: 509px;
+}
+.draw_area .baihe6{
+  z-index: 1001;
 }
 /* 轮播 */
 .swiper{width:1200px;margin:auto}
@@ -540,10 +690,13 @@ export default {
     margin-left: -18%;
     z-index: 3;
     transition:all 0.5s;
+    transform: rotate(360deg);
+    /* animation:myCDRotate 2s linear  infinite; */
 }
 .cdStart
 {
-    animation:myCDRotate 5s infinite linear;
+    /* animation:myCDRotate 5s infinite linear; */
+    animation:myCDRotate 2s linear  infinite;
 }
 .cdPause
 {
@@ -565,10 +718,21 @@ export default {
     -moz-transform-origin: top right;
     -webkit-transform-origin:top right;
     -o-transform-origin:top right;
+    /* transition:all 0.8s; */
+    /* transform:rotate(-130deg); */
+}
+.aaaa{
+  transition:all 0.8s;
+    transform:rotate(-130deg);
+}
+.zanting{
     transition:all 0.8s;
     transform:rotate(-130deg);
 }
-
+.xuanzhuan{
+    transition:all 0.8s;
+    transform:rotate(-99deg);
+}
 #controllerButton
 {
     width: 125px;
@@ -643,14 +807,14 @@ export default {
 /* 音乐播放器 */
 /* 大风车 */
 #canvas{
-  display: none;
+  /* display: none; */
   position: absolute;
   top:-7%;
 }
 /* 大风车 */
 /* 多啦a梦 */
 .pokonyan{
-  display:none;
+  /* display:none; */
 width:572px; height:397px; margin:0 auto; position: absolute; left:22%; top:56%; margin-left:-286px; margin-top:-198px;}
 
 .header{width:340px; height:318px; position:absolute; right:12px; top:0; border-top-left-radius:50%; border-top-right-radius:50%; border-bottom-left-radius:50%; border-bottom-right-radius:48%; background:#00a0e9; border:#000 solid 2px; z-index: 6;}
