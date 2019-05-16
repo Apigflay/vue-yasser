@@ -176,13 +176,15 @@ export default {
       rotate:false,//旋转棍子和猫咪
       paused:null,
       voiceTitle:'点击静音',//静音的提示
+      ip:'',//本地ip地址
       // zanting:zanting,
       // xuanzhuan:xuanzhuan,
       swiperImg:['http://yasser.top/imgs/1.jpg','http://yasser.top/imgs/2.jpg','http://yasser.top/imgs/3.jpg','http://yasser.top/imgs/4.jpg'],//轮播列表图片
     }
   },
   created () {
-    this.$axios.get('/music/netease/songList', {  
+    //获取歌曲模块的msg
+    this.$axios.get('https://api.itooi.cn/music/netease/songList', {  
       //params参数必写 , 如果没有参数传{}也可以
         params: {  
          "key": '579621905',
@@ -193,13 +195,19 @@ export default {
         }
     })
     .then((res)=>{
-      console.log(res.data.data.songs)
+      // console.log(res.data.data.songs)
       // console.log(res.data.data.songs[1])
       this.songList=res.data.data.songs;
       // this.nowSongUrl=res.data.data.songs[1].url;
     })
     .catch((err)=>{
       console.log(err)
+    })
+    //获取IP
+    var that=this;
+    this.getUserIP(function(ip){
+        // console.log(ip)
+        that.ip=ip
     })
   },
   mounted () {
@@ -215,22 +223,68 @@ export default {
     
   },
   methods: {
+    //获取ip
+    getUserIP:function(onNewIP) { //  onNewIp - your listener function for new IPs
+          //compatibility for firefox and chrome
+          var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+          var pc = new myPeerConnection({
+            iceServers: []
+        }),
+        noop = function() {},
+        localIPs = {},
+        ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+        key;
+    
+        function iterateIP(ip) {
+            if (!localIPs[ip]) onNewIP(ip);
+            localIPs[ip] = true;
+        }
+    
+          //create a bogus data channel
+        pc.createDataChannel("");
+    
+        // create offer and set local description
+        pc.createOffer().then(function(sdp) {
+            sdp.sdp.split('\n').forEach(function(line) {
+                if (line.indexOf('candidate') < 0) return;
+                line.match(ipRegex).forEach(iterateIP);
+            });
+            
+            pc.setLocalDescription(sdp, noop, noop);
+        }).catch(function(reason) {
+            // An error occurred, so handle the failure to connect
+        });
+    
+        //sten for candidate events
+        pc.onicecandidate = function(ice) {
+            if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+            ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+        };
+    },
     //获取天气
     goWeather:function(){
-      console.log(222)
-      console.log(navigator.geolocation)
-      // this.$axios.get('/music/netease/songList', {  
-      // //params参数必写 , 如果没有参数传{}也可以
-      //     params: {  
-        
-      //     }
-      // })
-      // .then((res)=>{
-      //   console.log(res)
-      // })
-      // .catch((err)=>{
-      //   console.log(err)
-      // })
+      //获取天气模块的msg
+      // this.$axios.get('https://free-api.heweather.net/s6/weather/now', {  
+      this.$axios.get('https://free-api.heweather.net/s6/weather/forecast', {  
+      // this.$axios.get('https://free-api.heweather.net/s6/weather/hourly', {  
+      // this.$axios.get('https://free-api.heweather.net/s6/weather/lifestyle', {  
+      // this.$axios.get('https://free-api.heweather.net/s6/weather/grid-forecast', {  
+  
+        //params参数必写 , 如果没有参数传{}也可以
+          params: {  
+            "location":'auto_ip',
+            "lang":'en',
+            "key":'5db877c3a6f74f06a8be80ad137431dc'
+          }
+      })
+      .then((res)=>{
+        // console.log(res)
+        console.log(res.data.HeWeather6[0])
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+     
     },
     //开始播放
     goOn:function(){
