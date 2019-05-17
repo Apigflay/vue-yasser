@@ -104,7 +104,25 @@
       </div>
       <div class="calendar">
         
+        
       </div>
+      <!-- 音乐列表 -->
+      <div class="musilist_area">
+        <!-- 选择框 -->
+        <el-select v-model="value" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+
+          <button @click="getMusicList">按钮</button>
+
+
+      </div>
+      <!-- 播放模块 -->
       <div class="audio_area" style="position:relative"> 
         <div @click="goFast" class="goF" style="width: 50px;height: 50px;background: rebeccapurple;position: absolute;top: 3px;left:410px;cursor:pointer;z-index:1000;">快进</div>
         <div class="songList_box">
@@ -152,6 +170,37 @@
         <!-- /* 音乐播放器 */ -->
         
       </div>
+      <!-- 劲爆mv -->
+      <div class="mvArea">
+          <div class="mvTitle">
+              <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
+                  <font color='red' size="5">劲</font>
+              </marquee>
+              <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
+                  <font color='red' size="5">爆</font>
+              </marquee>
+              <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
+                  <font color='red' size="5">M</font>
+              </marquee>
+              <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
+                  <font color='red' size="5">V</font>
+              </marquee>
+          </div>
+          <!-- <div class="mvList"> -->
+              <el-select class="mvList" v-model="value" placeholder="请选择要播放的mv">
+              <el-option
+                v-for="(item,index) in mvList"
+                :key="index"
+                :label="item.name"
+                :value="item.url">
+              </el-option>
+            </el-select>
+            正在播放{{value}}
+          <!-- </div> -->
+          <div class="mvT">
+            <video class="vedio" :src="value" autoplay ></video>
+          </div>
+      </div>
 
 
 
@@ -177,6 +226,24 @@ export default {
       paused:null,
       voiceTitle:'点击静音',//静音的提示
       ip:'',//本地ip地址
+      mvList:null,//mv列表
+      options: [{
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
+        value: '',
       // zanting:zanting,
       // xuanzhuan:xuanzhuan,
       swiperImg:['http://yasser.top/imgs/1.jpg','http://yasser.top/imgs/2.jpg','http://yasser.top/imgs/3.jpg','http://yasser.top/imgs/4.jpg'],//轮播列表图片
@@ -209,6 +276,7 @@ export default {
         // console.log(ip)
         that.ip=ip
     })
+    this.getMvList()
   },
   mounted () {
      this.draw()//大风车
@@ -223,6 +291,75 @@ export default {
     
   },
   methods: {
+    // 获取MV排行榜
+    getMvList:function(){
+        // https://api.itooi.cn/music/netease/topMvList     获取MV排行榜
+        this.$axios.get('https://api.itooi.cn/music/netease/topMvList', { 
+            
+          //params参数必写 , 如果没有参数传{}也可以
+            params: {  
+            "key": '579621905',
+              "limit":'11',
+              "contentType": "application/json;charset=utf-8"
+            }
+        })
+        .then((res)=>{
+          console.log(res.data.data)
+          this.mvList=res.data.data;
+          // console.log(res.data.data.songs[1])
+          // this.songList=res.data.data.songs;
+          // this.nowSongUrl=res.data.data.songs[1].url;
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+    },
+    // 
+    // 
+    // 
+
+
+    //获取歌单列表
+    getMusicList:function(){
+      console.log(this.value)
+      // https://api.itooi.cn/music/netease/highQualitySongList   获取精品歌单
+      this.$axios.get('https://api.itooi.cn/music/netease/highQualitySongList', {
+
+      // https://api.itooi.cn/music/netease/hotSongList    获取热门歌单
+      // this.$axios.get('https://api.itooi.cn/music/netease/hotSongList', { 
+
+        // https://api.itooi.cn/music/netease/search   搜索音乐/专辑/歌词/歌单/MV/用户/歌手/电台搜索
+        // https://api.itooi.cn/music/netease/search?key=579621905&s=我喜欢上你内心时的活动&type=song&limit=100&offset=0
+        // 音乐搜索:type=song
+        // 歌手搜索:type=singer
+        // 专辑搜索:type=album
+        // 歌单搜索:type=list
+        // 视频搜索:type=video
+        // 电台搜索:type=radio
+        // 用户搜索:type=user
+        // 歌词搜索:type=lrc
+        // this.$axios.get('https://api.itooi.cn/music/netease/search?key=579621905&s=庐州月&type=song&limit=100&offset=0', { 
+
+      // https://api.itooi.cn/music/netease/topMvList     获取MV排行榜
+      // this.$axios.get('https://api.itooi.cn/music/netease/topMvList', { 
+           
+        //params参数必写 , 如果没有参数传{}也可以
+          params: {  
+          "key": '579621905',
+            "limit":'20',
+            "contentType": "application/json;charset=utf-8"
+          }
+      })
+      .then((res)=>{
+        console.log(res)
+        // console.log(res.data.data.songs[1])
+        // this.songList=res.data.data.songs;
+        // this.nowSongUrl=res.data.data.songs[1].url;
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    },
     //获取ip
     getUserIP:function(onNewIP) { //  onNewIp - your listener function for new IPs
           //compatibility for firefox and chrome
@@ -284,7 +421,6 @@ export default {
       .catch((err)=>{
         console.log(err)
       })
-     
     },
     //开始播放
     goOn:function(){
@@ -587,6 +723,11 @@ export default {
 .calendar table:nth-child(5){
 
 }
+/* 音乐列表 */
+.musilist_area{
+ border:5px solid #e74d3c;
+ box-sizing: border-box;
+}
 /* 音乐 */
 .audio_area{
   /* border:5px solid black; */
@@ -642,6 +783,25 @@ export default {
   /* float:right; */
 }
 /* 音乐播放器 */
+/* 劲爆MV */
+.mvArea{
+  min-height: 20px;
+  border:5px solid #ffe43b;
+  position: relative;
+}
+.mvArea .mvList{
+  position:absolute;
+  left:0px;
+  top:0px;
+}
+.mvArea .mvT{
+  /* height: 530px; */
+}
+.vedio{
+  width: 1200px;
+  /* height: 530px; */
+}
+/* 劲爆MV */
 /*动画基础*/
 
 @keyframes myCDRotate
