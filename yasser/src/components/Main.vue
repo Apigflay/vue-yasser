@@ -2,13 +2,41 @@
 <template>
   <div class="main_rap">
     <div class="main">
+      <!-- canvas -->
       <div class="draw_area">
+        <!-- 天气弹框 -->
+        <el-popover
+        ref="weatherPopuver"
+          placement="right"
+          width="300"
+          trigger="click">
+          <!-- <div>最新更新时间&nbsp;&nbsp;&nbsp;{{weatherList.basic}}</div> -->
+          <!-- <div>最新更新时间&nbsp;&nbsp;&nbsp;{{weatherList.daily_forecast}}</div> -->
+          <div>最新更新时间&nbsp;&nbsp;&nbsp;{{weatherListTime}}</div> 
+          <br>
+          <div v-for="(item,index) in weatherListInfo" :key="index">
+            预报日期：{{item.date}}<br>
+            日出{{item.sr}}&nbsp;&nbsp;&nbsp;
+            日落{{item.ss}}<br>
+            温度&nbsp;&nbsp;&nbsp;{{item.tmp_min}}~~{{item.tmp_max}}℃<br>
+            能见度&nbsp;&nbsp;&nbsp;{{item.vis}}公里<br>
+            降水概率&nbsp;&nbsp;&nbsp;{{item.pcpn}}<br><br><br>
+            
+
+
+          </div>
+          <!-- <el-table :data="gridData">
+            <el-table-column width="150" property="date" label="日期"></el-table-column>
+            <el-table-column width="100" property="name" label="姓名"></el-table-column>
+            <el-table-column width="300" property="address" label="地址"></el-table-column>
+          </el-table> -->
+        </el-popover>
         <img class="baihe baihe1" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
         <img class="baihe baihe2" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
         <img class="baihe baihe3" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
         <img class="baihe baihe4" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
         <img class="baihe baihe5" src="http://yasser.top/imgs/baihebg.png" title="" alt="白鹤">
-        <img @click="goWeather" class="baihe baihe6" src="http://yasser.top/imgs/baihebg.png" title="点击查看天气" alt="白鹤">
+        <img v-popover:weatherPopuver class="baihe baihe6" src="http://yasser.top/imgs/baihebg.png" title="点击查看天气" alt="白鹤">
         <canvas id="canvas" width="800" height="600"></canvas>
         <div class="pokonyan">
           <!--头-->
@@ -94,6 +122,7 @@
           <div class="palml"></div>
         </div>
       </div>
+      <!-- swiper -->
       <div class="swiper">
         <el-carousel :interval="4000" type="card" height="200px">
           <el-carousel-item v-for="item in swiperImg" :key="item">
@@ -102,8 +131,9 @@
           </el-carousel-item>
         </el-carousel>
       </div>
+      <!-- 日历 -->
       <div class="calendar">
-        
+        <div></div>
         
       </div>
       <!-- 音乐列表 -->
@@ -174,20 +204,25 @@
       <div class="mvArea">
           <div class="mvTitle">
               <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
-                  <font color='red' size="5">劲</font>
+                  <font color='#660099' size="5">劲</font>
               </marquee>
               <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
-                  <font color='red' size="5">爆</font>
+                  <font color='#660099' size="5">爆</font>
               </marquee>
               <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
-                  <font color='red' size="5">M</font>
+                  <font color='#660099' size="5">M</font>
               </marquee>
               <marquee class="first" style="" direction="up" behavior="alternate" width="100" height="50" scrollamount="11" scrolldelay="100">
-                  <font color='red' size="5">V</font>
+                  <font color='#660099' size="5">V</font>
               </marquee>
           </div>
           <!-- <div class="mvList"> -->
-              <el-select class="mvList" v-model="value" placeholder="请选择要播放的mv">
+              <el-select
+              class="mvList"
+              v-model="value"
+              placeholder="请选择要播放的mv"
+              size="medium"
+              @change="getVedioName">
               <el-option
                 v-for="(item,index) in mvList"
                 :key="index"
@@ -195,10 +230,10 @@
                 :value="item.url">
               </el-option>
             </el-select>
-            正在播放{{value}}
+            正在播放    :   {{mvName}}
           <!-- </div> -->
           <div class="mvT">
-            <video class="vedio" :src="value" autoplay ></video>
+            <video class="vedio" :src="value" autoplay controls></video>
           </div>
       </div>
 
@@ -215,7 +250,7 @@ export default {
     return {
       msg: 'home',
       songList:null,
-      value: new Date(),
+      // value: new Date(),
       firstIndex:-1,//初始歌曲index
       nowSongName:'暂未播放歌曲',//正在播放的歌曲名称
       nowSongUrl:'',//正在播放的歌曲url
@@ -223,10 +258,16 @@ export default {
       songId:null,//播放状态
       autoplay:false,//初始自动播放
       rotate:false,//旋转棍子和猫咪
-      paused:null,
+      paused:null,//暂停功能
       voiceTitle:'点击静音',//静音的提示
       ip:'',//本地ip地址
       mvList:null,//mv列表
+      mvName:'暂无播放的mv',//正在播放的mv名字
+      value: '',//mv的链接
+      swiperImg:['http://yasser.top/imgs/1.jpg','http://yasser.top/imgs/2.jpg','http://yasser.top/imgs/3.jpg','http://yasser.top/imgs/4.jpg'],//轮播列表图片
+      weatherList:null,// 天气信息
+      weatherListTime:"",//天气更新时间
+      weatherListInfo:null,//三天的详情天气
       options: [{
           value: '选项1',
           label: '黄金糕'
@@ -243,10 +284,24 @@ export default {
           value: '选项5',
           label: '北京烤鸭'
         }],
-        value: '',
-      // zanting:zanting,
-      // xuanzhuan:xuanzhuan,
-      swiperImg:['http://yasser.top/imgs/1.jpg','http://yasser.top/imgs/2.jpg','http://yasser.top/imgs/3.jpg','http://yasser.top/imgs/4.jpg'],//轮播列表图片
+         gridData: [{
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }], 
+        
     }
   },
   created () {
@@ -276,7 +331,10 @@ export default {
         // console.log(ip)
         that.ip=ip
     })
+    // 获取电影
     this.getMvList()
+    // 获取天气
+    this.goWeather()
   },
   mounted () {
      this.draw()//大风车
@@ -291,34 +349,34 @@ export default {
     
   },
   methods: {
+    // 获取mv的名字
+    getVedioName:function(vId){
+       let obj = {};
+      obj = this.mvList.find((item)=>{//这里的selectList就是上面遍历的数据源
+          return item.url === vId;//筛选出匹配数据
+      });
+      console.log(obj.name);//我这边的name就是对应label的
+      this.mvName=obj.name;
+    },
     // 获取MV排行榜
     getMvList:function(){
         // https://api.itooi.cn/music/netease/topMvList     获取MV排行榜
         this.$axios.get('https://api.itooi.cn/music/netease/topMvList', { 
-            
           //params参数必写 , 如果没有参数传{}也可以
             params: {  
             "key": '579621905',
-              "limit":'11',
+              "limit":'30',
               "contentType": "application/json;charset=utf-8"
             }
         })
         .then((res)=>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           this.mvList=res.data.data;
-          // console.log(res.data.data.songs[1])
-          // this.songList=res.data.data.songs;
-          // this.nowSongUrl=res.data.data.songs[1].url;
         })
         .catch((err)=>{
           console.log(err)
         })
     },
-    // 
-    // 
-    // 
-
-
     //获取歌单列表
     getMusicList:function(){
       console.log(this.value)
@@ -416,7 +474,10 @@ export default {
       })
       .then((res)=>{
         // console.log(res)
-        console.log(res.data.HeWeather6[0])
+        console.log(res.data.HeWeather6[0]);
+        this.weatherList=res.data.HeWeather6[0];
+        this.weatherListTime=res.data.HeWeather6[0].update.loc;
+        this.weatherListInfo=res.data.HeWeather6[0].daily_forecast;
       })
       .catch((err)=>{
         console.log(err)
@@ -798,7 +859,7 @@ export default {
   /* height: 530px; */
 }
 .vedio{
-  width: 1200px;
+  width: 1190px;
   /* height: 530px; */
 }
 /* 劲爆MV */
